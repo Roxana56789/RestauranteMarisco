@@ -11,3 +11,4 @@ namespace RestauranteMariscos.Interfaces
         Task<bool> EliminarAsync(int id);
     }
 }
+
