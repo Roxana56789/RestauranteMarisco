@@ -10,4 +10,9 @@ namespace RestauranteMariscos.Interfaces
         Task<Platillo> UpdateAsync(Platillo platillo);
         Task<bool> DeleteAsync(int id);
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+>>>>>>> 7146aaff183ecd8a0e20871596efa348d3379f9f
