@@ -1,66 +1,73 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using RestauranteMariscos.Entidades;
+using RestauranteMariscos.Interfaces;
 
 namespace RestauranteMariscos.Controllers
 {
-    public class UsuarioController : Controller
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UsuarioController : ControllerBase
     {
-        // GET: /Usuario/
-        public IActionResult Index()
+        private readonly IUsuarioRepository _usuarioRepository;
+
+        public UsuarioController(IUsuarioRepository usuarioRepository)
         {
-            // Listar usuarios
-            return View();
+            _usuarioRepository = usuarioRepository;
         }
 
-        // GET: /Usuario/Crear
-        public IActionResult Crear()
+        // ✅ Obtener todos los usuarios
+        [HttpGet]
+        [Authorize(Roles = "Admin")] // Solo Admin puede ver todos
+        public async Task<ActionResult<IEnumerable<Usuario>>> GetAll()
         {
-            return View();
+            var usuarios = await _usuarioRepository.GetAllAsync();
+            return Ok(usuarios);
         }
 
-        // POST: /Usuario/Crear
+        // ✅ Obtener usuario por Id
+        [HttpGet("{id}")]
+        [Authorize] // Cualquier usuario autenticado
+        public async Task<ActionResult<Usuario>> GetById(int id)
+        {
+            var usuario = await _usuarioRepository.GetByIdAsync(id);
+            if (usuario == null)
+                return NotFound(new { message = "Usuario no encontrado" });
+
+            return Ok(usuario);
+        }
+
+        // ✅ Crear nuevo usuario
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Crear(string nombre, string correo)
+        [Authorize(Roles = "Admin")] // Solo Admin puede crear usuarios
+        public async Task<ActionResult<Usuario>> Create([FromBody] Usuario usuario)
         {
-            if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(correo))
-            {
-                ModelState.AddModelError("", "Todos los campos son obligatorios.");
-                return View();
-            }
-
-            // Guardar en BD
-
-            return RedirectToAction(nameof(Index));
+            var newUsuario = await _usuarioRepository.CreateAsync(usuario);
+            return CreatedAtAction(nameof(GetById), new { id = newUsuario.Id }, newUsuario);
         }
 
-        // GET: /Usuario/Editar/5
-        public IActionResult Editar(int id)
+        // ✅ Actualizar usuario
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")] // Solo Admin puede actualizar
+        public async Task<ActionResult<Usuario>> Update(int id, [FromBody] Usuario usuario)
         {
-            // Buscar usuario
-            return View(/*usuario*/);
+            if (id != usuario.Id)
+                return BadRequest(new { message = "El Id no coincide" });
+
+            var updatedUsuario = await _usuarioRepository.UpdateAsync(usuario);
+            return Ok(updatedUsuario);
         }
 
-        // POST: /Usuario/Editar/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Editar(int id, string nombre, string correo)
+        // ✅ Eliminar usuario
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")] // Solo Admin puede eliminar
+        public async Task<IActionResult> Delete(int id)
         {
-            if (string.IsNullOrEmpty(nombre) || string.IsNullOrEmpty(correo))
-            {
-                ModelState.AddModelError("", "Todos los campos son obligatorios.");
-                return View();
-            }
+            var deleted = await _usuarioRepository.DeleteAsync(id);
+            if (!deleted)
+                return NotFound(new { message = "Usuario no encontrado" });
 
-            // Actualizar usuario
-
-            return RedirectToAction(nameof(Index));
-        }
-
-        // GET: /Usuario/Eliminar/5
-        public IActionResult Eliminar(int id)
-        {
-            // Eliminar usuario
-            return RedirectToAction(nameof(Index));
+            return NoContent();
         }
     }
 }

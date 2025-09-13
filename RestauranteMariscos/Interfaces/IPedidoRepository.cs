@@ -4,10 +4,10 @@ namespace RestauranteMariscos.Interfaces
 {
     public interface IPedidoRepository
     {
-        Task<Pedido> CrearAsync(Pedido pedido);
-        Task<Pedido?> ObtenerPorIdAsync(int id);
-        Task<IEnumerable<Pedido>> ObtenerTodosAsync();
-        Task<Pedido?> ActualizarAsync(Pedido pedido);
-        Task<bool> EliminarAsync(int id);
+        Task<IEnumerable<Pedido>> GetAllAsync();
+        Task<Pedido> GetByIdAsync(int id);
+        Task<Pedido> CreateAsync(Pedido pedido);
+        Task<Pedido> UpdateAsync(Pedido pedido);
+        Task<bool> DeleteAsync(int id);
     }
 }
