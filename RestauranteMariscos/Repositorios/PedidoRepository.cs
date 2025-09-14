@@ -1,8 +1,7 @@
 ﻿using RestauranteMariscos.Entidades;
-using System;
 using Microsoft.EntityFrameworkCore;
 using RestauranteMariscos.Data;
-using RestauranteMariscos.Entidades;
+using System;
 
 
 namespace RestauranteMariscos.Repositorios

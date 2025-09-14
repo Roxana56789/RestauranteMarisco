@@ -6,7 +6,7 @@ using System;
 
 namespace RestauranteMariscos.Repositories
 {
-    public class UsuarioRepository : IUsuarioRepository
+    public class UsuarioRepository 
     {
         private readonly AppDbContext _context;
 
